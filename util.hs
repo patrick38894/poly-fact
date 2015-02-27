@@ -1,11 +1,11 @@
 import Data.Matrix
 
 
-interpolate :: (Num, Num) -> Matrix Num
+interpolate :: [(Num, Num)] -> Matrix Num
 
 interpolate xs = let n = length xs
 		     m = matrix n n $ \(i,j) -> (fst (xs !! (i-1))) ^ (n-j)
-		     p  = gaussJordElim m $ matrix n 1 $ \(i,j) -> snd (xs !! (i-1))
+		     p = gaussJordElim m $ matrix n 1 $ \(i,j) -> snd (xs !! (i-1))
 		 in toList p
 
 
@@ -13,9 +13,10 @@ solveLower :: Matrix Num -> Matrix Num -> [Num]
 
 solveLower l b
 	| nrows b == 0 = []
-	| otherwise = let (x,y) = (l ! (1,1), b ! (1,1))
-		      in (y / x):solveLower m` b`
-	where m` = minorMatrix 1 1 m
+	| otherwise =  (y / x):solveLower m` b`
+	where x = l ! (1,1)
+	      y = b ! (1,1)
+	      m` = minorMatrix 1 1 m
 	      b` = matrix (nrows b -1) 1 $ \(i,j) -> (b ! (i+1,j))*(1-y/x)
 
 solveUpper :: Matrix Num -> Matrix Num -> [Num]
@@ -23,9 +24,10 @@ solveUpper :: Matrix Num -> Matrix Num -> [Num]
 
 solveUpper u y 
 	| nrows y == 0 = []
-	| otherwise = let (a,b) = (u ! (nrows u,ncols u), y ! (1,nrows b))
-		      in (b / a):f u' y'
-	where u' = minorMatrix (nrows u) (ncols u) u
+	| otherwise = (b / a):f u' y'
+	where a = u ! (nrows u,ncols u)
+	      b = y ! (1,nrows b)
+	      u' = minorMatrix (nrows u) (ncols u) u
 	      y' = matrix (nrows y -1) 1 $ \(i,j) -> (y ! (i+1,j))*(1-b/a)
 
 
