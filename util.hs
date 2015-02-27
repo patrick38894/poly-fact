@@ -40,8 +40,8 @@ solveUpper u y -- note :: unlike solveLower, answer comes out reversed
 
 gaussJordElim :: (Fractional a, Ord a) => Matrix a -> Matrix a -> Matrix a
 
-gaussJordElim a b = let (l,u,p,d) = fromJust (luDecomp a)
-			y = solveLower l (p * b)
+gaussJordElim a b = let (u,l,p,d) = fromJust (luDecomp a)
+			y = solveLower l (p * b) 
 			x = reverse $ solveUpper u $ fromList (length y) 1 y
 		    in fromList (length x) 1 x
 
