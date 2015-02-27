@@ -1,6 +1,35 @@
 import Data.Matrix
 import Data.Maybe
+import Data.List
 
+
+--------------------prime factorization algorithms (naive) ------------------
+
+
+factor :: Int -> [Int]
+
+factor i = let f = (\n c -> if (c * c) > n
+			    then [n]
+			    else if (n `mod` c) == 0
+				 then c:f (n `quot` c) c
+				 else f n (c + 1))
+	   in f i 2
+
+	   
+signedFactor :: Int -> [Int]
+
+signedFactor i = let p = factor i
+		 in p ++ map negate p
+
+
+factorSet :: Int -> [Int]
+
+factorSet i = sort $ nub $ signedFactor i
+
+
+
+
+---------------polynomial interpolation---------------------
 
 interpolate :: (Fractional a, Ord a) => [(a,a)] -> [a]
 
@@ -8,6 +37,9 @@ interpolate xs = let n = length xs
 		     m = matrix n n $ \(i,j) -> (fst (xs !! (i-1))) ^ (n-j)
 		     p = gaussJordElim m $ matrix n 1 $ \(i,j) -> snd (xs !! (i-1))
 		 in matToList p
+
+
+-------------gauss-jordan-elimination for solving systems of linear equations-------------
 
 
 solveLower :: (Fractional a, Ord a) => Matrix a -> Matrix a -> [a]
@@ -51,4 +83,34 @@ matToList x
 	| nrows x == 0 = []
 	| nrows x == 1 = [x ! (1,1)]
 	| otherwise = (x ! (1,1)):(matToList $ submatrix 2 (nrows x) 1 1 x)
+
+
+
+
+
+-----------------------polynomial utilities-------------------
+
+eval :: (Num a, Ord a) => [a] -> a -> a
+
+eval [] x = 0
+eval (p:ps) x = p * x ^ (length ps) + eval ps x
+
+
+pdiv :: Int a => [a] -> [a] -> Maybe [a]
+
+pdiv pp@(p:ps) qq@(q:qs)
+	| length qq > length pp = Nothing
+	| q > p = Nothing
+	| p `mod` q == 0 = (p `quot` q):a ---in progress
+	
+
+
+
+
+
+
+
+
+
+
 
