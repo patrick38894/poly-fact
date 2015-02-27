@@ -21,12 +21,12 @@ solveLower l b
 	      l' = let size = nrows l
 		   in case size of 1 -> submatrix 1 1 1 1 l
 				   otherwise -> submatrix 2 (nrows l) 2 (ncols l) l
-	      b' = matrix (nrows b -1) 1 $ \(i,j) -> (b ! (i+1,j))*(1-y/x)
+	      b' = matrix (nrows b -1) 1 $ \(i,j) -> (b ! (i+1,j)) -(y/x*(l ! (i+1,1)))
 
 solveUpper :: (Fractional a, Ord a) => Matrix a -> Matrix a -> [a]
 
 
-solveUpper u y 
+solveUpper u y -- note :: unlike solveLower, answer comes out reversed 
 	| nrows y == 0 = []
 	| nrows y == 1 = [b/a]
 	| otherwise = (b / a):solveUpper u' y'
@@ -35,14 +35,14 @@ solveUpper u y
 	      u' = let size = nrows u
 		   in case size of 1 -> submatrix 1 1 1 1 u
 				   otherwise -> submatrix 1 (nrows u -1) 1 (ncols u -1) u
-	      y' = matrix (nrows y -1) 1 $ \(i,j) -> (y ! (i+1,j))*(1-b/a)
+	      y' = matrix (nrows y -1) 1 $ \(i,j) -> (y ! (i,j)) -(b/a)*(u ! (i,ncols u))
 
 
 gaussJordElim :: (Fractional a, Ord a) => Matrix a -> Matrix a -> Matrix a
 
 gaussJordElim a b = let (l,u,p,d) = fromJust (luDecomp a)
 			y = solveLower l (p * b)
-			x = solveUpper u $ fromList (length y) 1 y
+			x = reverse $ solveUpper u $ fromList (length y) 1 y
 		    in fromList (length x) 1 x
 
 matToList :: Matrix a -> [a]
