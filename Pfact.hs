@@ -12,7 +12,9 @@ pfactor p = let recPfactor pp m
 					  pts = map (zip s) np
 					  q = maybeTake (\x -> pdiv pp $ map ceiling $ intInterpolate x) pts
 				      in case q of Nothing -> recPfactor pp (m-1)
-						   Just qq -> qq:(pfactor $ fromJust $ pdiv pp qq)
+						   Just qq -> if qq == [1]
+							      then [pp]
+							      else (pfactor qq) ++ (pfactor $ fromJust $ pdiv pp qq)
 	    in recPfactor p $ (length p `quot` 2) +1
 
 
@@ -35,3 +37,8 @@ maybeTake f (x:xs) = case f x of Nothing -> maybeTake f xs
 intInterpolate :: [(Int, Int)] -> [Rational]
 
 intInterpolate l = interpolate $ map (\(x,y) -> (toRational x, toRational y)) l
+
+
+
+main :: IO()
+main = print $ pfactor [-1,-3,-3,-1]
