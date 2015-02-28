@@ -96,12 +96,19 @@ eval [] x = 0
 eval (p:ps) x = p * x ^ (length ps) + eval ps x
 
 
-pdiv :: Int a => [a] -> [a] -> Maybe [a]
+pdiv :: [Int] -> [Int] -> Maybe [Int]
 
+
+pdiv [] _ = Just []
 pdiv pp@(p:ps) qq@(q:qs)
-	| length qq > length pp = Nothing
-	| q > p = Nothing
-	| p `mod` q == 0 = (p `quot` q):a ---in progress
+	| p `mod` q /= 0 = Nothing
+	| length qq > length pp = if allZeros pp then Just [] else Nothing
+	| otherwise = (pdiv pp' qq) >>= (\x -> Just (c:x))
+	where c = (p `quot` q)
+	      cd = length pp - length qq --degree of the constant factor
+	      pp' = zipWith (-) ps $ (map (*c) qs) ++ take cd (repeat 0)
+	      allZeros x = foldl (\y z -> y && (z == 0)) True x
+	      
 	
 
 
