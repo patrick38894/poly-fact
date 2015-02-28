@@ -112,7 +112,9 @@ pdiv :: [Int] -> [Int] -> Maybe [Int]
 
 
 pdiv [] _ = Just []
+pdiv _ [] = Nothing
 pdiv pp@(p:ps) qq@(q:qs)
+	| q == 0 = pdiv pp qs
 	| p `mod` q /= 0 = Nothing
 	| length qq > length pp = if allZeros pp then Just [] else Nothing
 	| otherwise = (pdiv pp' qq) >>= (\x -> Just (c:x))
@@ -122,6 +124,21 @@ pdiv pp@(p:ps) qq@(q:qs)
 	      allZeros x = foldl (\y z -> y && (z == 0)) True x
 	      
 	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
