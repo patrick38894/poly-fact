@@ -17,9 +17,12 @@ pfactor p = let recPfactor pp m
 
 ndSubsets :: [[a]] -> [[a]]
 
-ndSubsets [] = []
-ndSubsets (([a]):x) = map ([a]++) $ ndSubsets x
-ndSubsets ((a:as):x) = (ndSubsets ([a]:x)) ++ (ndSubsets (as:x))
+ndSubsets [] = [[]]
+ndSubsets (a:as) = case a of [x] -> map (++ [x]) $ ndSubsets as
+                             othewise -> (map (++ [head a]) $ ndSubsets as) ++ (ndSubsets $ (tail a):as)
+
+
+
 
 
 maybeTake :: (a -> Maybe a) -> [a] -> Maybe a
