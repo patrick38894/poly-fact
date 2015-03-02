@@ -8,14 +8,20 @@ pfactor p = let recPfactor pp m
 			| otherwise = let s = [0..m]
 					  s' = map (eval p) s
 					  f = map factorSet s'
-					  np = ndSubsets f -- <---NP-Complete :(
+					  np = ndSubsets f
 					  pts = map (zip s) np
-					  q = maybeTake (\x -> pdiv pp $ map ceiling $ intInterpolate x) pts
+					  q = maybeTake (((=<<) (\y -> if (y == [1]) || (y == [-1]) then Nothing else Just y)) . (\x -> pdiv pp $ intInterpolate x)) pts
 				      in case q of Nothing -> recPfactor pp (m-1)
-						   Just qq -> if qq == [1]
-							      then [pp]
-							      else (pfactor qq) ++ (pfactor $ fromJust $ pdiv pp qq)
-	    in recPfactor p $ (length p `quot` 2)
+						   Just qq -> (pfactor qq) ++ (pfactor $ fromJust $ pdiv pp qq)
+	    in recPfactor p $ (length p `quot` 2) + 1
+
+
+remove :: Eq b => [b] -> [[b]] -> [[b]]
+
+remove x [] = []
+remove x (y:ys) = if x == y
+		  then remove x ys
+		  else y:(remove x ys)
 
 
 ndSubsets :: [[a]] -> [[a]]
@@ -34,9 +40,9 @@ maybeTake f [] = Nothing
 maybeTake f (x:xs) = case f x of Nothing -> maybeTake f xs
 				 Just y -> Just y
 
-intInterpolate :: [(Int, Int)] -> [Rational]
+intInterpolate :: [(Int, Int)] -> [Int]
 
-intInterpolate l = interpolate $ map (\(x,y) -> (toRational x, toRational y)) l
+intInterpolate l = map ceiling $ interpolate $ map (\(x,y) -> (toRational x, toRational y)) l
 
 
 
