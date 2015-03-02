@@ -7,8 +7,11 @@ module Util
 , solveUpper
 , gaussJordElim
 , eval
-, pdiv
 , matToList
+, pdiv
+, padd
+, pshiftl
+, pmul
 ) where
 
 import Data.Matrix
@@ -36,7 +39,7 @@ signedFactor i = let p = factor i
 
 factorSet :: Int -> [Int]
 
-factorSet i = sort $ nub $ signedFactor i
+factorSet i = reverse $ sort $ nub $ signedFactor i
 
 
 
@@ -125,8 +128,28 @@ pdiv pp@(p:ps) qq@(q:qs)
 	      
 	
 
+pmul :: [Int] -> [Int] -> [Int]
+
+pmul _ [] = [0]
+pmul [] _ = [0]
+pmul xx@(x:xs) yy@(y:ys) = padd (pshiftl (map (*x) yy) $ length xs) $ pmul xs yy
 
 
+pshiftl :: [Int] -> Int -> [Int]
+
+pshiftl p n = p ++ (take n $ repeat 0)
+
+
+padd :: [Int] -> [Int] -> [Int]
+
+
+padd [] _ = []
+padd _ [] = []
+padd xx@(x:xs) yy@(y:ys) = let xl = length xx
+			       yl = length yy
+			   in case compare xl yl of GT -> x:(padd xs yy)
+						    LT -> y:(padd xx ys)
+						    EQ -> zipWith (+) xx yy
 
 
 

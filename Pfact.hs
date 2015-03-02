@@ -15,7 +15,7 @@ pfactor p = let recPfactor pp m
 						   Just qq -> if qq == [1]
 							      then [pp]
 							      else (pfactor qq) ++ (pfactor $ fromJust $ pdiv pp qq)
-	    in recPfactor p $ (length p `quot` 2) +1
+	    in recPfactor p $ (length p `quot` 2)
 
 
 ndSubsets :: [[a]] -> [[a]]
