@@ -1,6 +1,7 @@
 import Util
 import Data.Ratio
 import Data.Maybe
+import Data.List
 
 pfactor :: [Int] -> [[Int]]
 
@@ -46,14 +47,14 @@ maybeList :: [Maybe a] -> Maybe [a]
 maybeList [] = Just []
 
 maybeList (a:as) = case a of Nothing -> Nothing
-			     Just b -> maybeList (as) >>= (\x -> Just (concat b x))
+			     Just b -> (maybeList (as)) >>= (\x -> Just (b:x))
 
 maybeInterpolate :: [(Int, Int)] -> Maybe [Int]
 
 maybeInterpolate l = let f a = if denominator a == 1
-			     then Just numerator a
-			     else Nothing
-		   in maybeList $ f $ interpolate $ map (\(x,y) -> (toRational x, toRational y)) l
+			       then Just (fromIntegral $ numerator a)
+			       else Nothing
+		     in maybeList $ map f $ interpolate $ map (\(x,y) -> (toRational x, toRational y)) l
 
 
 
