@@ -6,8 +6,8 @@ import Data.List
 pfactor :: [Int] -> [[Int]]
 
 pfactor p = let recPfactor pp m
-			| m < 0 = [pp]
-			| otherwise = let s = [0..m]
+			| m <= 0 = [pp]
+			| otherwise = let s = map ((+) (-1 * (m `quot` 2)))[0..m]
 					  s' = map (eval p) s
 					  f = map factorSet s'
 					  np = ndSubsets f
@@ -59,4 +59,4 @@ maybeInterpolate l = let f a = if denominator a == 1
 
 
 main :: IO()
-main = print $ pfactor [-1,-3,-3,-1]
+main = print $ pfactor [1,1]

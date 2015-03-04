@@ -33,7 +33,7 @@ factor i = let f = (\n c -> if (c * c) > n
 	   
 signedFactor :: Int -> [Int]
 
-signedFactor i = let p = factor i
+signedFactor i = let p = factor $ abs i
 		 in p ++ map negate p
 
 
@@ -113,18 +113,26 @@ eval (p:ps) x = p * x ^ (length ps) + eval ps x
 
 pdiv :: [Int] -> [Int] -> Maybe [Int]
 
-
+-----------------------------WROOOOOONG--------VVVVVVVVVVVVVV----------------
 pdiv [] _ = Just []
 pdiv _ [] = Nothing
 pdiv pp@(p:ps) qq@(q:qs)
-	| q == 0 = pdiv pp qs
 	| p `mod` q /= 0 = Nothing
-	| length qq > length pp = if allZeros pp then Just [] else Nothing
+	| degree qq > degree pp = if allZeros pp then Just [] else Nothing
 	| otherwise = (pdiv pp' qq) >>= (\x -> Just (c:x))
 	where c = (p `quot` q)
-	      cd = length pp - length qq --degree of the constant factor
+	      cd = degree pp - degree qq --degree of the constant factor
 	      pp' = zipWith (-) ps $ (map (*c) qs) ++ take cd (repeat 0)
 	      allZeros x = foldl (\y z -> y && (z == 0)) True x
+
+
+degree :: [Int] -> Int
+degree [] = 0
+degree [a] = 0
+degree (x:xs) = if x == 0
+		then degree xs
+		else length xs
+
 	      
 	
 
