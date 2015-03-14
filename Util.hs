@@ -110,21 +110,32 @@ eval :: (Num a, Ord a) => [a] -> a -> a
 eval [] x = 0
 eval (p:ps) x = p * x ^ (length ps) + eval ps x
 
-
 pdiv :: [Int] -> [Int] -> Maybe [Int]
+pdiv x y = pdiv' (stripZeros x) (stripZeros y)
 
------------------------------WROOOOOONG--------VVVVVVVVVVVVVV----------------
-pdiv [] _ = Just []
-pdiv _ [] = Nothing
-pdiv pp@(p:ps) qq@(q:qs)
+pdiv' :: [Int] -> [Int] -> Maybe [Int]
+
+pdiv' [] _ = Just []
+pdiv' pp@(p:ps) qq@(q:qs)
 	| p `mod` q /= 0 = Nothing
-	| degree qq > degree pp = if allZeros pp then Just [] else Nothing
-	| otherwise = (pdiv pp' qq) >>= (\x -> Just (c:x))
-	where c = (p `quot` q)
-	      cd = degree pp - degree qq --degree of the constant factor
-	      pp' = zipWith (-) ps $ (map (*c) qs) ++ take cd (repeat 0)
-	      allZeros x = foldl (\y z -> y && (z == 0)) True x
+	| length pp == length qq = if foldl (\x y -> x && y == 0) True $ zipWith (-) pp $ map (*c) qq
+				   then Just [c]
+				   else Nothing
+	| otherwise = (mcons c) =<< pdiv' (zipWith' (-) ps $ map (*c) qs) qq
+	where c = p `quot` q
+	      mcons a b = Just (a:b)
+	      zipWith' :: (a ->  a -> a) -> [a] -> [a] -> [a]
+	      zipWith' f a [] = a
+	      zipWith' f [] _ = []
+	      zipWith' f aa@(a:as) bb@(b:bs) = if length aa == length bb
+					       then zipWith f aa bb
+					       else (f a b):(zipWith' f as bs)
 
+
+stripZeros :: [Int] -> [Int]
+stripZeros [] = []
+stripZeros (0:xs) = stripZeros xs
+stripZeros (x:xs) = (x:xs)
 
 degree :: [Int] -> Int
 degree [] = 0
@@ -158,26 +169,5 @@ padd xx@(x:xs) yy@(y:ys) = let xl = length xx
 			   in case compare xl yl of GT -> x:(padd xs yy)
 						    LT -> y:(padd xx ys)
 						    EQ -> zipWith (+) xx yy
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
